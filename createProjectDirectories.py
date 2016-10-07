@@ -105,6 +105,7 @@ def writeIgnore(fout):
         '*.bbl',
         '*.blg',
         '*.ods',
+        '*.zip',
         ' ',
         '>>>>>>> other',
         ' ',
