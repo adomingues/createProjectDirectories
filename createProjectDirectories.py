@@ -7,11 +7,12 @@ import argparse
 import sys
 import os
 import shutil
+import subprocess
 
 
 usage = '''
    Creates a directory and subdirectories for a version controlled project.
-   Starts either a mercurial (hg) or a git repo.
+   Starts either a mercurial (hg) or a git (default) repo.
    Project structure follows roughly the suggestions from:
    A Quick Guide to Organizing Computational Biology Projects
    http://dx.doi.org/10.1371/journal.pcbi.1000424
@@ -25,7 +26,7 @@ usage = '''
         results/
 
     Notes:
-    By default it assumes that the repo will live online in bitbucket, and the user name is also set to "adomingues".  Use option -r to change this and/or edit directly in the code.
+    By default it assumes that the repo will live online in bitbucket, and the user name is also set to "adomingues".  Use option -r to change this and/or edit directly in the code. If bitbucket-cli is installed (pip install --user bitbucket-cli) it will also create the repo.
    '''
 
 
@@ -45,6 +46,7 @@ def getArgs():
         '-vc', '--versionControl',
         required=True,
         type=str,
+        default="git",
         help='Options: hg or git. Starts version control with list of ignored files included.'
     )
     parser.add_argument(
@@ -155,6 +157,26 @@ def startVC(project, vcs, repo):
     writeIgnore(ignore)
 
 
+def cmdExists(cmd):
+    '''
+    Source: https://stackoverflow.com/a/11069822/1274242
+    '''
+    return subprocess.call("type " + cmd, shell=True, 
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+
+
+def createBickBucketRepo(project, vcs, repo):
+    print("Creating online repo..")
+    cmd = "bitbucket"
+    bit_arguments = ("bitbucket create --private --protocol ssh --scm git " + project).split(" ")
+    git_add = ("git remote add origin https://adomingues@bitbucket.org/adomingues/" + project + ".git").split(" ")
+    git_push = "git push --set-upstream origin master"
+    if repo == "bitbucket" and cmdExists(cmd) and vcs == "git":
+        call = [cmd, bit_arguments, repo]
+        subprocess.check_call(bit_arguments) 
+        subprocess.call(git_add) 
+        subprocess.call(git_push) 
+
 def createDocs(project):
     print('Creating minimal docs for project')
     docs = ["doc/" + project + ".md",
@@ -174,6 +196,7 @@ def main():
     args = getArgs()
     project = args.project
     repo = args.repository
+
     print("The project's name is: ", project)
     if args.versionControl == "git":
         vcs = args.versionControl
@@ -186,6 +209,8 @@ def main():
     createDocs(project)
     startVC(project, vcs, repo)
     os.chdir(current_dir)
+    print("Changing directory to: " + os.getcwd())
+    createBickBucketRepo(project, vcs, repo)
 
 
 if __name__ == "__main__":
