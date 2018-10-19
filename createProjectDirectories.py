@@ -181,6 +181,7 @@ def createBickBucketRepo(project, vcs, repo):
         print('2. git commit -m "Initial commit."')
         print('3. git push -u origin master')
 
+
 def createDocs(project):
     print('Creating minimal docs for project')
     docs = ["doc/" + project + ".md",
