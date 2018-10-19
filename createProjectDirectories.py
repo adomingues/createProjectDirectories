@@ -172,7 +172,7 @@ def createBickBucketRepo(project, vcs, repo):
     git_add = ("git remote add origin https://adomingues@bitbucket.org/adomingues/" + project + ".git").split(" ")
     git_push = "git push --set-upstream origin master"
     if repo == "bitbucket" and cmdExists(cmd) and vcs == "git":
-        call = [cmd, bit_arguments, repo]
+        call = [bit_arguments]
         subprocess.check_call(bit_arguments) 
         subprocess.call(git_add) 
         subprocess.call(git_push) 
