@@ -169,13 +169,17 @@ def createBickBucketRepo(project, vcs, repo):
     print("Creating online repo..")
     cmd = "bitbucket"
     bit_arguments = ("bitbucket create --private --protocol ssh --scm git " + project).split(" ")
-    git_add = ("git remote add origin https://adomingues@bitbucket.org/adomingues/" + project + ".git").split(" ")
-    git_push = "git push --set-upstream origin master"
+    git_add_remote = ("git remote add origin https://adomingues@bitbucket.org/adomingues/" + project + ".git").split(" ")
+    git_push = ("git push -u origin master").split(" ")
     if repo == "bitbucket" and cmdExists(cmd) and vcs == "git":
         call = [bit_arguments]
-        subprocess.check_call(bit_arguments) 
-        subprocess.call(git_add) 
-        subprocess.call(git_push) 
+        subprocess.check_call(bit_arguments)
+        os.chdir(project)
+        subprocess.call(git_add_remote) 
+        print('Next steps:')
+        print('1. Add files with "git add <files>"')
+        print('2. git commit -m "Initial commit."')
+        print('3. git push -u origin master')
 
 def createDocs(project):
     print('Creating minimal docs for project')
